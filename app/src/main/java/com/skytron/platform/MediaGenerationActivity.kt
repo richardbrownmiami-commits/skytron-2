@@ -20,7 +20,7 @@ class MediaGenerationActivity : AppCompatActivity() {
     private lateinit var adapter: ImageGridAdapter
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.fragment_vault)
+        setContentView(R.layout.activity_media_generation)
         prefs = getSharedPreferences("skytron", MODE_PRIVATE)
         val key = prefs.getString("api_key", "") ?: ""
         val url = prefs.getString("gateway_url", getString(R.string.gateway_url)) ?: ""
