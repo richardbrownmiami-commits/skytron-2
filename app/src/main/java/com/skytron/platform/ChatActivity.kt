@@ -45,7 +45,7 @@ class ChatActivity : AppCompatActivity() {
         val ghToken = prefs.getString("github_token", "") ?: ""
         val ghRepo = prefs.getString("github_repo", "richardbrownmiami-commits/skytron-platform") ?: ""
         val upgrader = if (ghToken.isNotBlank()) SkillUpgrader(this, api, model, ghToken, ghRepo) else null
-        engine = ReActEngine(this, api, model, sys, upgrader)
+        engine = ReActEngine(this, api, model, sys, upgrader = upgrader)
         val rv = findViewById<RecyclerView>(R.id.chatRecycler)
         adapter = ChatAdapter(mutableListOf())
         rv.adapter = adapter
