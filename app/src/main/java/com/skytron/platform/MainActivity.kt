@@ -8,6 +8,10 @@ import android.os.PowerManager
 import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.View
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.FrameLayout
@@ -54,15 +58,19 @@ class MainActivity : AppCompatActivity() {
             CarouselPage("Brain") { inf, parent ->
                 val v = inf.inflate(R.layout.fragment_brain, parent, false)
                 fun load() {
-                    val phase = api.brainPhase(brainUrl())
-                    val emotions = api.brainEmotions(brainUrl())
-                    val stream = api.brainStream(brainUrl())
-                    v.findViewById<TextView>(R.id.brainPhase).text = "Phase: ${phase?.get("phase") ?: "—"}"
-                    val em = emotions?.let { e -> listOf("happy","energetic","intelligent","bad").joinToString("  ") { "$it=${e[it]}" } } ?: "—"
-                    v.findViewById<TextView>(R.id.brainEmotions).text = "Emotions: $em"
-                    v.findViewById<TextView>(R.id.brainEnergy).text = "Energy: ${emotions?.get("energy") ?: "—"}%  |  Confidence: ${emotions?.get("confidence") ?: "—"}%"
-                    val thoughts = stream?.take(5)?.joinToString("\n") { m -> "${m["content"]?.toString()?.take(80) ?: ""}" } ?: "—"
-                    v.findViewById<TextView>(R.id.brainThoughts).text = thoughts
+                    lifecycleScope.launch(Dispatchers.IO) {
+                        val phase = api.brainPhase(brainUrl())
+                        val emotions = api.brainEmotions(brainUrl())
+                        val stream = api.brainStream(brainUrl())
+                        withContext(Dispatchers.Main) {
+                            v.findViewById<TextView>(R.id.brainPhase).text = "Phase: ${phase?.get("phase") ?: "—"}"
+                            val em = emotions?.let { e -> listOf("happy","energetic","intelligent","bad").joinToString("  ") { "$it=${e[it]}" } } ?: "—"
+                            v.findViewById<TextView>(R.id.brainEmotions).text = "Emotions: $em"
+                            v.findViewById<TextView>(R.id.brainEnergy).text = "Energy: ${emotions?.get("energy") ?: "—"}%  |  Confidence: ${emotions?.get("confidence") ?: "—"}%"
+                            val thoughts = stream?.take(5)?.joinToString("\n") { m -> "${m["content"]?.toString()?.take(80) ?: ""}" } ?: "—"
+                            v.findViewById<TextView>(R.id.brainThoughts).text = thoughts
+                        }
+                    }
                 }
                 v.findViewById<Button>(R.id.brainRefreshBtn).setOnClickListener { load() }
                 v.postDelayed({ load() }, 500)
