@@ -13,12 +13,14 @@ class ReActEngine(
     private val toolExec = ToolExecutor(ctx)
     private val maxLoop = 5
     fun process(userInput: String, history: MutableList<LlmMessage>): LlmMessage {
-        history.add(LlmMessage("user", userInput))
+        val msgs = mutableListOf(LlmMessage("system", systemPrompt))
+        msgs.addAll(history)
+        msgs.add(LlmMessage("user", userInput))
         var finalResponse = ""
         for (i in 0 until maxLoop) {
-            val resp = api.callLlm(model, listOf(LlmMessage("system", systemPrompt)) + history)
+            val resp = api.callLlm(model, msgs)
             val content = resp.choices?.firstOrNull()?.message?.content ?: return LlmMessage("assistant", "LLM error: ${resp.error}")
-            history.add(LlmMessage("assistant", content))
+            msgs.add(LlmMessage("assistant", content))
             val toolMatch = Regex("""TOOL:(\w+):(.+?)(?:\n|$)""", RegexOption.DOT_MATCHES_ALL).find(content)
             if (toolMatch == null) {
                 finalResponse = content; break
@@ -31,7 +33,7 @@ class ReActEngine(
                 result = toolExec.execute(tool, input)
                 if (!result.success) result = ToolResult(false, "$upgradeMsg (but still failed: ${result.output})")
             }
-            history.add(LlmMessage("system", "OBSERVATION: ${result.output}"))
+            msgs.add(LlmMessage("system", "OBSERVATION: ${result.output}"))
             if (i == maxLoop - 1) finalResponse = "Completed after $maxLoop steps."
         }
         return LlmMessage("assistant", finalResponse.ifBlank { "Done." })
