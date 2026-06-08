@@ -7,11 +7,11 @@ class ReActEngine(
     private val ctx: Context,
     private val api: SkytronApi,
     private val model: String,
-    private val systemPrompt: String,= 5,
+    private val systemPrompt: String,
+    private val maxLoop: Int = 5,
     private val upgrader: com.skytron.platform.upgrade.SkillUpgrader? = null
 ) {
     private val toolExec = ToolExecutor(ctx)
-    private val maxLoop: Int
     fun process(userInput: String, history: MutableList<LlmMessage>): LlmMessage {
         val msgs = mutableListOf(LlmMessage("system", systemPrompt))
         msgs.addAll(history)
