@@ -14,15 +14,10 @@ class ProactiveMonitor(
 ) {
     private val handler = Handler(Looper.getMainLooper())
     private var lastBatteryPct = 100
-    fun start() {
-        checkBattery()
-        checkReminders()
-        handler.postDelayed({
-            checkBattery()
-            checkReminders()
-            handler.postDelayed({ start() }, 30000)
-        }, 5000)
+    private val ticker = object : Runnable {
+        override fun run() { checkBattery(); checkReminders(); handler.postDelayed(this, 30000) }
     }
+    fun start() { ticker.run() }
     private fun checkBattery() {
         val intent = ctx.registerReceiver(null, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
         val level = intent?.getIntExtra(BatteryManager.EXTRA_LEVEL, 0) ?: return
@@ -37,19 +32,17 @@ class ProactiveMonitor(
         lastBatteryPct = pct
     }
     private fun checkReminders() {
-        Thread {
-            try {
+        try {
+            kotlinx.coroutines.runBlocking(kotlinx.coroutines.Dispatchers.IO) {
                 val db = AppDatabase.get(ctx)
                 val now = System.currentTimeMillis()
-                kotlinx.coroutines.runBlocking(kotlinx.coroutines.Dispatchers.IO) {
-                    val due = db.reminderDao().due(now)
-                    for (r in due) {
-                        onAlert(ProactiveAlert("Reminder", r.text, 1))
-                        db.reminderDao().markDone(r.id)
-                    }
+                val due = db.reminderDao().due(now)
+                for (r in due) {
+                    onAlert(ProactiveAlert("Reminder", r.text, 1))
+                    db.reminderDao().markDone(r.id)
                 }
-            } catch (_: Exception) {}
-        }.start()
+            }
+        } catch (_: Exception) {}
     }
     fun stop() { handler.removeCallbacksAndMessages(null) }
 }
