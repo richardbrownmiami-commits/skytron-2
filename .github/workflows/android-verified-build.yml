@@ -8,6 +8,8 @@ on:
       - 'settings.gradle.kts'
       - 'gradle/**'
       - '.github/workflows/**'
+permissions:
+  contents: write
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -37,3 +39,13 @@ jobs:
           path: app/build/outputs/apk/release/app-release.apk
           archive: false
           if-no-files-found: error
+      - name: Create release with APK
+        run: |
+          gh release create latest --title "Build ${{ github.sha }}" \
+            --notes "Skytron release build ${{ github.run_number }}" \
+            app/build/outputs/apk/release/app-release.apk \
+            --repo "${{ github.repository }}" --target "${{ github.sha }}" 2>/dev/null || \
+          gh release upload latest app/build/outputs/apk/release/app-release.apk \
+            --repo "${{ github.repository }}" --clobber
+        env:
+          GH_TOKEN: ${{ github.token }}
