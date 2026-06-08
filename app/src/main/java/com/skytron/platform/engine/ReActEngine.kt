@@ -7,8 +7,7 @@ class ReActEngine(
     private val ctx: Context,
     private val api: SkytronApi,
     private val model: String,
-    private val systemPrompt: String,
-    private val maxLoop: Int = 5,
+    private val systemPrompt: String,= 5,
     private val upgrader: com.skytron.platform.upgrade.SkillUpgrader? = null
 ) {
     private val toolExec = ToolExecutor(ctx)
