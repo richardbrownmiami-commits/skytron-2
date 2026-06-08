@@ -1,11 +1,13 @@
 package com.skytron.platform
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.webkit.WebView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.skytron.platform.avatar.AvatarWebView
 import com.skytron.platform.ui.RippleOverlay
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 class AvatarCoreActivity : AppCompatActivity() {
     private lateinit var avatar: AvatarWebView
     private lateinit var ripple: RippleOverlay
@@ -24,7 +26,7 @@ class AvatarCoreActivity : AppCompatActivity() {
                 android.view.ViewGroup.LayoutParams.MATCH_PARENT
             )
         }
-        (findViewById<android.widget.FrameLayout>(android.R.id.content)).addView(ripple)
+       
         window.decorView.postDelayed({
             avatar.setExpression("happy")
         }, 2000)
