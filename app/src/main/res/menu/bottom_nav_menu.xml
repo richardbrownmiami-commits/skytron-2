@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/nav_chat" android:icon="@android:drawable/ic_menu_edit"
+    <item android:id="@+id/nav_chat" android:icon="@drawable/ic_chat"
         android:title="Chat" />
-    <item android:id="@+id/nav_brain" android:icon="@android:drawable/ic_menu_info_details"
+    <item android:id="@+id/nav_brain" android:icon="@drawable/ic_brain"
         android:title="Brain" />
-    <item android:id="@+id/nav_avatar" android:icon="@android:drawable/ic_menu_myplaces"
+    <item android:id="@+id/nav_avatar" android:icon="@drawable/ic_avatar"
         android:title="Avatar" />
-    <item android:id="@+id/nav_vault" android:icon="@android:drawable/ic_menu_gallery"
+    <item android:id="@+id/nav_vault" android:icon="@drawable/ic_vault"
         android:title="Vault" />
 </menu>
